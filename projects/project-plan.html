@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>BÁO CÁO KẾ HOẠCH PHÁT TRIỂN - QUẢN LÝ VĂN BẢN THÔNG MINH</title>
+<style>
+  @page { size: A4; margin: 2cm; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 13px; color: #333; line-height: 1.6; padding: 30px; }
+  h1 { text-align: center; font-size: 22px; color: #1a5276; margin-bottom: 5px; border-bottom: 3px solid #1a5276; padding-bottom: 10px; }
+  h2 { font-size: 17px; color: #1a5276; margin: 25px 0 10px; padding-bottom: 5px; border-bottom: 2px solid #2980b9; }
+  h3 { font-size: 14px; color: #2c3e50; margin: 15px 0 8px; }
+  .subtitle { text-align: center; color: #666; font-size: 12px; margin-bottom: 20px; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0 20px; }
+  th { background: #1a5276; color: white; padding: 8px 10px; text-align: left; font-size: 12px; }
+  td { padding: 7px 10px; border: 1px solid #ddd; font-size: 12px; }
+  tr:nth-child(even) { background: #f4f6f7; }
+  .timeline-container { margin: 20px 0; padding: 20px; overflow-x: auto; }
+  .timeline { display: flex; position: relative; min-width: 900px; }
+  .timeline::before { content: ''; position: absolute; top: 40px; left: 0; right: 0; height: 3px; background: #2980b9; }
+  .phase { flex: 1; text-align: center; position: relative; padding-top: 55px; }
+  .phase-dot { width: 20px; height: 20px; background: #2980b9; border: 3px solid white; border-radius: 50%; position: absolute; top: 30px; left: 50%; transform: translateX(-50%); z-index: 2; }
+  .phase-box { background: #ebf5fb; border: 2px solid #2980b9; border-radius: 8px; padding: 10px; font-size: 11px; }
+  .phase-box h4 { color: #1a5276; margin-bottom: 5px; font-size: 12px; }
+  .phase-box .date { color: #e74c3c; font-weight: bold; font-size: 11px; }
+  .phase-box ul { list-style: none; text-align: left; margin-top: 8px; padding: 0; }
+  .phase-box ul li { padding: 2px 0; font-size: 10px; color: #555; }
+  .phase-box ul li::before { content: '▸ '; color: #2980b9; }
+  .legend { display: flex; justify-content: center; gap: 20px; margin: 15px 0; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; }
+  .legend-color { width: 14px; height: 14px; border-radius: 3px; }
+  .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
+  .feature-card { border: 1px solid #ddd; border-radius: 6px; padding: 10px; background: #fafafa; }
+  .feature-card h4 { font-size: 12px; color: #1a5276; margin-bottom: 5px; }
+  .feature-card p { font-size: 11px; color: #555; }
+  .priority-high { color: #e74c3c; font-weight: bold; }
+  .priority-medium { color: #f39c12; font-weight: bold; }
+  .priority-low { color: #27ae60; font-weight: bold; }
+  .section-break { page-break-before: always; }
+  .header-table { width: 100%; margin-bottom: 20px; }
+  .header-table td { border: none; font-size: 12px; padding: 3px 10px; }
+  .header-table td:first-child { font-weight: bold; color: #1a5276; width: 120px; }
+  .gantt-container { margin: 15px 0; overflow-x: auto; }
+  .gantt-row { display: flex; align-items: center; margin-bottom: 3px; }
+  .gantt-label { width: 180px; font-size: 10px; font-weight: bold; color: #2c3e50; flex-shrink: 0; padding-right: 8px; }
+  .gantt-bar-wrapper { flex: 1; height: 20px; position: relative; background: #ecf0f1; border-radius: 3px; }
+  .gantt-bar { position: absolute; height: 16px; top: 2px; border-radius: 3px; }
+  .gantt-months { display: flex; margin-bottom: 5px; font-size: 9px; color: #666; }
+  .gantt-month { flex: 1; text-align: center; }
+  .status-done { background: #27ae60; }
+  .status-progress { background: #f39c12; }
+  .status-pending { background: #3498db; }
+  .status-blocked { background: #e74c3c; }
+  .footer { margin-top: 40px; padding-top: 10px; border-top: 1px solid #ccc; font-size: 10px; color: #888; text-align: center; }
+  .table-of-contents { background: #f4f6f7; padding: 15px 20px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #2980b9; }
+  .table-of-contents li { margin: 3px 0; font-size: 12px; }
+  .risk-table td:first-child { width: 30%; }
+</style>
+</head>
+<body>
+
+<h1>📋 BÁO CÁO KẾ HOẠCH PHÁT TRIỂN</h1>
+<p class="subtitle">Hệ thống Quản lý Văn bản Thông minh Nội bộ Doanh nghiệp<br>Dựa trên nền tảng Nextcloud + Astrolabe (AI Search)</p>
+
+<table class="header-table">
+<tr><td>Tên dự án:</td><td>Quản lý văn bản thông minh nội bộ doanh nghiệp</td></tr>
+<tr><td>Nền tảng:</td><td>Nextcloud v34.0.4 + Astrolabe App + MCP Server</td></tr>
+<tr><td>Ngày lập:</td><td>16/09/2026</td></tr>
+<tr><td>Thời lượng:</td><td>6 tháng (chia 4 giai đoạn)</td></tr>
+<tr><td>Phê duyệt:</td><td>_________________ (Chưa phê duyệt)</td></tr>
+</table>
+
+<h2>Mục lục</h2>
+<div class="table-of-contents">
+<ol>
+<li>Tổng quan dự án &amp; kiến trúc</li>
+<li>Danh sách tính năng chi tiết</li>
+<li>Sơ đồ Timeline dự án</li>
+<li>Gantt Chart — Lộ trình theo tháng</li>
+<li>Phân công &amp; ưu tiên từng tính năng</li>
+<li>Rủi ro &amp; giải pháp khắc phục</li>
+</ol>
+</div>
+
+<!-- SECTION 1 -->
+<h2>1. Tổng quan dự án &amp; Kiến trúc</h2>
+
+<p><strong>Mục tiêu:</strong> Xây dựng hệ thống quản lý văn bản thông minh cho doanh nghiệp, tích hợp AI (semantic search, tóm tắt, Q&A), chat nội bộ phân quyền, gọi điện AI hỗ trợ, và cảnh báo văn bản hết hạn.</p>
+
+<h3>Sơ đồ kiến trúc hệ thống</h3>
+<div style="text-align:center; padding:20px; background:#f8f9fa; border-radius:8px; margin:15px 0; font-family:monospace; font-size:11px; line-height:2;">
+<strong>┌─────────────────────────────────────────────────────────────┐<br>
+│                    NGƯỜI DÙNG (Browser/App)                  │<br>
+└──────────────────────────┬────────────────────────────────────┘<br>
+                           │<br>
+┌──────────────────────────▼────────────────────────────────────┐<br>
+│                    NEXTCLOUD v34 (Port 8085)                  │<br>
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌────────────────┐  │<br>
+│  │  Talk    │ │ Documents│ │Calendar  │ │ Workflow       │  │<br>
+│  │ (Chat)   │ │(Collab)  │ │(Nhắc)   │ │(Tự động hóa)  │  │<br>
+│  └────┬─────┘ └────┬─────┘ └────┬─────┘ └───────┬────────┘  │<br>
+│       │             │            │               │            │<br>
+│  ┌────┴─────────────┴────────────┴───────────────┴────────┐  │<br>
+│  │           ASTROLABE APP (AI Layer)                     │  │<br>
+│  │  Semantic Search │ Summary │ Chunk Viewer │ Q&A Engine │  │<br>
+│  └─────────────────────┬───────────────────────────────────┘  │<br>
+│                        │                                       │<br>
+│  ┌─────────────────────▼───────────────────────────────────┐  │<br>
+│  │           MCP SERVER (Port 8000)                        │  │<br>
+│  │   AI Engine │ Vector DB │ OCR │ Summarizer │ STT/TTS   │  │<br>
+│  └─────────────────────────────────────────────────────────┘  │<br>
+│                                                               │<br>
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐    │<br>
+│  │ Asterisk     │  │ PostgreSQL   │  │ Elasticsearch    │    │<br>
+│  │ (Telephony)  │  │ (Metadata)   │  │ (Search Index)   │    │<br>
+│  └──────────────┘  └──────────────┘  └──────────────────┘    │<br>
+└───────────────────────────────────────────────────────────────┘</div>
+
+<!-- SECTION 2 -->
+<div class="section-break"></div>
+<h2>2. Danh sách Tính năng Chi tiết</h2>
+
+<h3>2.1 💬 Chat nội bộ phân quyền các cấp</h3>
+<table>
+<tr><th>#</th><th>Tính năng</th><th>Mô tả</th><th>Ưu tiên</th></tr>
+<tr><td>1.1</td><td>Chat phòng ban</td><td>Tạo room chat theo phòng ban (group-based). Chỉ thành viên phòng mới vào được.</td><td><span class="priority-high">Cao</span></td></tr>
+<tr><td>1.2</td><td>Chat liên cấp</td><td>Chat giữa cấp quản lý và cấp dưới, mỗi cấp thấy nội dung khác nhau (privacy per-level).</td><td><span class="priority-high">Cao</span></td></tr>
+<tr><td>1.3</td><td>AI trợ lý trong chat</td><td>@ai trong chat → AI tìm tài liệu liên quan trả lời. Tích hợp MCP server.</td><td><span class="priority-medium">Trung bình</span></td></tr>
+<tr><td>1.4</td><td>Tìm kiếm lịch sử chat</td><td>Semantic search toàn bộ lịch sử chat theo ngữ cảnh.</td><td><span class="priority-medium">Trung bình</span></td></tr>
+<tr><td>1.5</td><td>Tin nhắn hết hạn</td><td>Tin nhắn tự ẩn sau X ngày theo cấu hình. Workflow Engine.</td><td><span class="priority-low">Thấp</span></td></tr>
+</table>
+
+<h3>2.2. 📞 Gọi điện AI hỗ trợ theo từng người dùng</h3>
+<table>
+<tr><th>#</th><th>Tính năng</th><th>Mô tả</th><th>Ưu tiên</th></tr>
+<tr><td>2.1</td><td>Tổng đài AI</td><td>Asterisk + API: gọi vào → AI đọc profile → tra cứu tài liệu → phản hồi bằng giọng nói.</td><td><span class="priority-medium">Trung bình</span></td></tr>
+<tr><td>2.2</td><td>Hỗ trợ cá nhân hóa</td><td>AI biết quyền truy cập của từng user → chỉ trả lời đúng tài liệu được phép xem.</td><td><span class="priority-high">Cao</span></td></tr>
+<tr><td>2.3</td><td>Nhắc cuộc họp qua giọng nói</td><td>AI gọi điện nhắc cuộc họp dựa trên Calendar trước 30/15/5 phút.</td><td><span class="priority-medium">Trung bình</span></td></tr>
+<tr><td>2.4</td><td>Xác thực cuộc gọi</td><td>AI xác minh danh tính qua số điện thoại → cấp quyền truy cập tài liệu bằng giọng nói.</td><td><span class="priority-low">Thấp</span></td></tr>
+</table>
+
+<h3>2.3 ⏰ Cảnh báo văn bản hết hạn</h3>
+<table>
+<tr><th>#</th><th>Tính năng</th><th>Mô tả</th><th>Ưu tiên</th></tr>
+<tr><td>3.1</td><td>Gắn ngày hết hạn</td><td>Custom metadata field `expiration_date` cho mỗi file/văn bản.</td><td><span class="priority-high">Cao</span></td></tr>
+<tr><td>3.2</td><td>Cảnh báo nhiều cấp</td><td>30 ngày → email → 7 ngày → email + push → hết hạn → tự khóa file.</td><td><span class="priority-high">Cao</span></td></tr>
+<tr><td>3.3</td><td>Dashboard giám sát</td><td>Trang quản trị hiển thị văn bản sắp hết hạn theo phòng ban.</td><td><span class="priority-high">Cao</span></td></tr>
+<tr><td>3.4</td><td>Phê duyệt gia hạn</td><td>Workflow: hết hạn gần → request phê duyệt → manager chấp nhận → gia hạn.</td><td><span class="priority-medium">Trung bình</span></td></tr>
+<tr><td>3.5</td><td>Tự động lưu trữ</td><td>Hết hạn → tự move file vào "archived" + thông báo owner.</td><td><span class="priority-low">Thấp</span></td></tr>
+</table>
+
+<h3>2.4 🧨 AI Tích hợp (Astrolabe/MCP)</h3>
+<table>
+<tr><th>#</th><th>Tính năng</th><th>Mô tả</th><th>Ưu tiên</th></tr>
+<tr><td>4.1</td><td>Tìm kiếm ngữ nghĩa</td><td>Tìm văn bản bằng ngôn ngữ tự nhiên. Đã có sẵn (SemanticSearchProvider).</td><td><span class="priority-high">Cao</span></td></tr>
+<tr><td>4.2</td><td>Tóm tắt tài liệu</td><td>Upload tài liệu dài → AI tóm tắt 5 điểm chính. SummaryService.</td><td><span class="priority-high">Cao</span></td></tr>
+<tr><td>4.3</td><td>Hỏi đáp tài liệu (Q&A)</td><td>Nhập câu hỏi → AI trả lời trích dẫn nguồn từ tài liệu.</td><td><span class="priority-high">Cao</span></td></tr>
+<tr><td>4.4</td><td>Phân loại tự động</td><td>AI tự gắn tag: hợp đồng, báo cáo, quy định.</td><td><span class="priority-medium">Trung bình</span></td></tr>
+<tr><td>4.5</td><td>Chunk viewer</td><td>Xem xét từng phần tài liệu lớn, AI phân tích từng chunk.</td><td><span class="priority-medium">Trung bình</span></td></tr>
+</table>
+
+<!-- SECTION 3 -->
+<div class="section-break"></div>
+<h2>3. Sơ đồ Timeline Dự án</h2>
+
+<div class="timeline-container">
+  <div class="legend">
+    <div class="legend-item"><div class="legend-color" style="background:#27ae60;"></div> Đã hoàn thành</div>
+    <div class="legend-item"><div class="legend-color" style="background:#f39c12;"></div> Đang thực hiện</div>
+    <div class="legend-item"><div class="legend-color" style="background:#3498db;"></div> Lập kế hoạch</div>
+    <div class="legend-item"><div class="legend-color" style="background:#e74c3c;"></div> Bị blocking</div>
+  </div>
+  <div class="timeline">
+    <div class="phase">
+      <div class="phase-dot"></div>
+      <div class="phase-box">
+        <h4>Giai đoạn 1<br>Nền tảng</h4>
+        <span class="date">Tháng 1-2</span>
+        <ul>
+          <li>MCP server production</li>
+          <li>Nextcloud + Astrolabe</li>
+          <li>Phân quyền phòng ban</li>
+          <li>Semantic search cơ bản</li>
+          <li>Cấu hình hạ tầng</li>
+        </ul>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-dot" style="background:#f39c12;"></div>
+      <div class="phase-box">
+        <h4>Giai đoạn 2<br>Chat + Workflow</h4>
+        <span class="date">Tháng 3-4</span>
+        <ul>
+          <li>Chat nội bộ phân quyền</li>
+          <li>Cảnh báo hết hạn</li>
+          <li>Dashboard quản trị</li>
+          <li>Workflow Engine</li>
+          <li>Metadata system</li>
+        </ul>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-dot" style="background:#3498db;"></div>
+      <div class="phase-box">
+        <h4>Giai đoạn 3<br>AI Nâng cao</h4>
+        <span class="date">Tháng 5-6</span>
+        <ul>
+          <li>AI trợ lý chat</li>
+          <li>Tóm tắt tài liệu</li>
+          <li>Q&A engine</li>
+          <li>Gọi điện AI (STT/TTS)</li>
+          <li>Phân loại tự động</li>
+        </ul>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-dot" style="background:#3498db;"></div>
+      <div class="phase-box">
+        <h4>Giai đoạn 4<br>Hoàn thiện</h4>
+        <span class="date">Tháng 7-8</span>
+        <ul>
+          <li>Mobile / PWA</li>
+          <li>Tích hợp email</li>
+          <li>Audit &amp; compliance</li>
+          <li>Kiểm thử bảo mật</li>
+          <li>Deployment production</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 4 -->
+<div class="section-break"></div>
+<h2>4. Gantt Chart — Lộ trình theo tháng</h2>
+
+<h3>4.1. Timeline tổng quan (8 tháng)</h3>
+<div class="gantt-container">
+  <div class="gantt-months">
+    <div class="gantt-month">Tháng 1</div>
+    <div class="gantt-month">Tháng 2</div>
+    <div class="gantt-month">Tháng 3</div>
+    <div class="gantt-month">Tháng 4</div>
+    <div class="gantt-month">Tháng 5</div>
+    <div class="gantt-month">Tháng 6</div>
+    <div class="gantt-month">Tháng 7</div>
+    <div class="gantt-month">Tháng 8</div>
+  </div>
+
+  <div class="gantt-row"><div class="gantt-label">MCP Server Setup</div><div class="gantt-bar-wrapper"><div class="gantt-bar status-done" style="left:0%;width:25%;"></div></div></div>
+  <div class="gantt-row"><div class="gantt-label">Nextcloud + Astrolabe</div><div class="gantt-bar-wrapper"><div class="gantt-bar status-done" style="left:0%;width:25%;"></div></div></div>
+  <div class="gantt-row"><div class="gantt-label">Phân quyền phòng ban</div><div class="gantt-bar-wrapper"><div class="gantt-bar status-done" style="left:0%;width:12.5%;"></div></div></div>
+  <div class="gantt-row"><div class="gantt-label">Semantic Search cơ bản</div><div class="gantt-bar-wrapper"><div class="gantt-bar status-done" style="left:0%;width:25%;"></div></div></div>
+
+  <div class="gantt-row" style="margin-top:8px;"><div class="gantt-label" style="font-size:11px;color:#1a5276;">GIAI ĐOẠN 2</div><div class="gantt-bar-wrapper"><div class="gantt-bar" style="left:0;width:0;background:transparent;"></div></div></div>
+
+  <div class="gantt-row"><div class="gantt-label">Chat nội bộ phân quyền</div><div class="gantt-bar-wrapper"><div class="gantt-bar status-pending" style="left:25%;width:25%;"></div></div></div>
+  <div class="gantt-row"><div class="gantt-label">Cảnh báo hết hạn</div><div class="gantt-bar-wrapper"><div class="gantt-bar status-pending" style="left:25%;width:25%;"></div></div></div>
+  <div class="gantt-row"><div class="gantt-label">Dashboard quản trị</div><div class="gantt-bar-wrapper"><div class="gantt-bar status-pending" style="left:37.5%;width:12.5%;"></div></div></div>
+  <div class="gantt-row"><div class="gantt-label">Workflow Engine config</div><div class="gantt-bar-wrapper"><div class="gantt-bar status-pending" style="left:25%;width:25%;"></div></div></div>
+
+  <div class="gantt-row" style="margin-top:8px;"><div class="gantt-label" style="font-size:11px;color:#1a5276;">GIAI ĐOẠN 3</div><div class="gantt-bar-wrapper"><div class="gantt-bar" style="left:0;width:0;background:transparent;"></div></div></div>
+
+  <div class="gantt-row"><div class="gantt-label">AI trợ lý trong chat</div><div class="gantt-bar-wrapper"><div class="gantt-bar status-pending" style="left:50%;width:25%;"></div></div></div>
+  <div class="gantt-row"><div class="gantt-label">Tóm tắt tài liệu</div><div class="gantt-bar-wrapper"><div class="gantt-bar status-pending" style="left:50%;width:25%;"></div></div></div>
+  <div class="gantt-row"><div class="gantt-label">Q&A Engine</div><div class="gantt-bar-wrapper"><div class="gantt-bar status-pending" style="left:62.5%;width:12.5%;"></div></div></div>
+  <div class="gantt-row"><div class="gantt-label">Gọi điện AI (STT/TTS)</div><div class="gantt-bar-wrapper"><div class="gantt-bar status-pending" style="left:50%;width:25%;"></div></div></div>
+
+  <div class="gantt-row" style="margin-top:8px;"><div class="gantt-label" style="font-size:11px;color:#1a5276;">GIAI ĐOẠN 4</div><div class="gantt-bar-wrapper"><div class="gantt-bar" style="left:0;width:0;background:transparent;"></div></div></div>
+
+  <div class="gantt-row"><div class="gantt-label">Mobile / PWA</div><div class="gantt-bar-wrapper"><div class="gantt-bar status-pending" style="left:75%;width:25%;"></div></div></div>
+  <div class="gantt-row"><div class="gantt-label">Tích hợp email</div><div class="gantt-bar-wrapper"><div class="gantt-bar status-pending" style="left:75%;width:12.5%;"></div></div></div>
+  <div class="gantt-row"><div class="gantt-label">Audit &amp; Compliance</div><div class="gantt-bar-wrapper"><div class="gantt-bar status-pending" style="left:75%;width:25%;"></div></div></div>
+  <div class="gantt-row"><div class="gantt-label">Deployment Production</div><div class="gantt-bar-wrapper"><div class="gantt-bar status-pending" style="left:87.5%;width:12.5%;"></div></div></div>
+</div>
+
+<h3>4.2. Chi tiết Gantt — Giai đoạn 2: Chat + Cảnh báo (4 tháng)</h3>
+<div class="gantt-container">
+  <div class="gantt-months">
+    <div class="gantt-month">Tuần 1-2</div>
+    <div class="gantt-month">Tuần 3-4</div>
+    <div class="gantt-month">Tuần 5-6</div>
+    <div class="gantt-month">Tuần 7-8</div>
+    <div class="gantt-month">Tuần 9-10</div>
+    <div class="gantt-month">Tuần 11-12</div>
+    <div class="gantt-month">Tuần 13-14</div>
+    <div class="gantt-month">Tuần 15-16</div>
+  </div>
+
+  <div class="gantt-row"><div class="gantt-label">Thiết kế DB Schema</div><div class="gantt-bar-wrapper"><div class="gantt-bar status-pending" style="left:0%;width:25%;"></div></div></div>
+  <div class="gantt-row"><div class="gantt-label">Backend API Chat</div><div class="gantt-bar-wrapper"><div class="gantt-bar status-pending" style="left:12.5%;width:37.5%;"></div></div></div>
+  <div class="gantt-row"><div class="gantt-label">UI Chat Room</div><div class="gantt-bar-wrapper"><div class="gantt-bar status-pending" style="left:25%;width:25%;"></div></div></div>
+  <div class="gantt-row"><div class="gantt-label">Permission Layer</div><div class="gantt-bar-wrapper"><div class="gantt-bar status-pending" style="left:25%;width:37.5%;"></div></div></div>
+  <div class="gantt-row"><div class="gantt-label">Metadata Expiration</div><div class="gantt-bar-wrapper"><div class="gantt-bar status-pending" style="left:37.5%;width:25%;"></div></div></div>
+  <div class="gantt-row"><div class="gantt-label">Alert Workflow</div><div class="gantt-bar-wrapper"><div class="gantt-bar status-pending" style="left:50%;width:25%;"></div></div></div>
+  <div class="gantt-row"><div class="gantt-label">Dashboard</div><div class="gantt-bar-wrapper"><div class="gantt-bar status-pending" style="left:62.5%;width:25%;"></div></div></div>
+  <div class="gantt-row"><div class="gantt-label">Testing &amp; Bugfix</div><div class="gantt-bar-wrapper"><div class="gantt-bar status-pending" style="left:75%;width:25%;"></div></div></div>
+</div>
+
+<!-- SECTION 5 -->
+<div class="section-break"></div>
+<h2>5. Phân công &amp; Ưu tiên Tính năng</h2>
+
+<h3>5.1. Ma trận ưu tiên</h3>
+<table>
+<tr><th>Tính năng</th><th>Ưu tiên</th><th>Giai đoạn</th><th>Owner</th><th>Status</th></tr>
+<tr><td>MCP Server Setup</td><td><span class="priority-high">Cao</span></td><td>G1</td><td>DevOps</td><td>Đang thực hiện</td></tr>
+<tr><td>Nextcloud + Astrolabe cài đặt</td><td><span class="priority-high">Cao</span></td><td>G1</td><td>Backend</td><td>Đang thực hiện</td></tr>
+<tr><td>Phân quyền phòng ban</td><td><span class="priority-high">Cao</span></td><td>G1</td><td>Backend</td><td>Chưa bắt đầu</td></tr>
+<tr><td>Semantic Search cơ bản</td><td><span class="priority-high">Cao</span></td><td>G1</td><td>Backend</td><td>Đã có sẵn</td></tr>
+<tr><td>Chat phòng ban</td><td><span class="priority-high">Cao</span></td><td>G2</td><td>Backend + Frontend</td><td>Chưa bắt đầu</td></tr>
+<tr><td>Chat liên cấp</td><td><span class="priority-high">Cao</span></td><td>G2</td><td>Backend + Frontend</td><td>Chưa bắt đầu</td></tr>
+<tr><td>Cảnh báo hết hạn (metadata)</td><td><span class="priority-high">Cao</span></td><td>G2</td><td>Backend</td><td>Chưa bắt đầu</td></tr>
+<tr><td>Cảnh báo nhiều cấp (workflow)</td><td><span class="priority-high">Cao</span></td><td>G2</td><td>Backend</td><td>Chưa bắt đầu</td></tr>
+<tr><td>Dashboard giám sát</td><td><span class="priority-high">Cao</span></td><td>G2</td><td>Frontend</td><td>Chưa bắt đầu</td></tr>
+<tr><td>Hỗ trợ cá nhân hóa AI call</td><td><span class="priority-high">Cao</span></td><td>G3</td><td>AI + Backend</td><td>Chưa bắt đầu</td></tr>
+<tr><td>AI trợ lý trong chat</td><td><span class="priority-medium">TB</span></td><td>G3</td><td>AI + Frontend</td><td>Chưa bắt đầu</td></tr>
+<tr><td>Tóm tắt tài liệu</td><td><span class="priority-high">Cao</span></td><td>G3</td><td>AI</td><td>Đã có sẵn (SummaryService)</td></tr>
+<tr><td>Q&A Engine</td><td><span class="priority-high">Cao</span></td><td>G3</td><td>AI</td><td>Chưa bắt đầu</td></tr>
+<tr><td>Nhắc cuộc họp AI</td><td><span class="priority-medium">TB</span></td><td>G3</td><td>AI + Calendar</td><td>Chưa bắt đầu</td></tr>
+<tr><td>Tổng đài AI</td><td><span class="priority-medium">TB</span></td><td>G3</td><td>AI + Telephony</td><td>Chưa bắt đầu</td></tr>
+<tr><td>Phân loại tự động</td><td><span class="priority-medium">TB</span></td><td>G3</td><td>AI</td><td>Chưa bắt đầu</td></tr>
+<tr><td>Chunk viewer</td><td><span class="priority-medium">TB</span></td><td>G3</td><td>Frontend</td><td>Đã có sẵn</td></tr>
+<tr><td>Tin nhắn hết hạn</td><td><span class="priority-low">Thấp</span></td><td>G2</td><td>Backend</td><td>Chưa bắt đầu</td></tr>
+<tr><td>Phê duyệt gia hạn</td><td><span class="priority-medium">TB</span></td><td>G2</td><td>Backend</td><td>Chưa bắt đầu</td></tr>
+<tr><td>Tự động lưu trữ</td><td><span class="priority-low">Thấp</span></td><td>G2</td><td>Backend</td><td>Chưa bắt đầu</td></tr>
+<tr><td>Xác thực cuộc gọi</td><td><span class="priority-low">Thấp</span></td><td>G3</td><td>AI + Telephony</td><td>Chưa bắt đầu</td></tr>
+<tr><td>Mobile / PWA</td><td><span class="priority-low">Thấp</span></td><td>G4</td><td>Frontend</td><td>Chưa bắt đầu</td></tr>
+<tr><td>Tích hợp email</td><td><span class="priority-low">Thấp</span></td><td>G4</td><td>Backend</td><td>Chưa bắt đầu</td></tr>
+<tr><td>Audit &amp; Compliance</td><td><span class="priority-low">Thấp</span></td><td>G4</td><td>Backend</td><td>Chưa bắt đầu</td></tr>
+<tr><td>Deployment Production</td><td><span class="priority-high">Cao</span></td><td>G4</td><td>DevOps</td><td>Chưa bắt đầu</td></tr>
+</table>
+
+<!-- SECTION 6 -->
+<div class="section-break"></div>
+<h2>6. Rủi ro &amp; Giải pháp khắc phục</h2>
+
+<table class="risk-table">
+<tr><th>Rủi ro</th><th>Mức độ</th><th>Xác suất</th><th>Giải pháp</th></tr>
+<tr><td>MCP server không ổn định / downtime</td><td><span class="priority-high">Cao</span></td><td>Cao</td><td>HTTP 503 graceful degradation đã triển khai. Cache status cục bộ. Frontend hiển thị banner rõ ràng.</td></tr>
+<tr><td>Thiếu tài nguyên tính toán cho AI (GPU/CPU)</td><td><span class="priority-high">Cao</span></td><td>Trung bình</td><td>Sử dụng cloud GPU cho MCP server. Rate limiting trên API.</td></tr>
+<tr><td>Vector DB quá tải khi số tài liệu tăng</td><td><span class="priority-medium">TB</span></td><td>Trung bình</td><td>Elasticsearch cluster. Index chia nhỏ. Batch indexing.</td></tr>
+<tr><td>Bảo mật dữ liệu (chat, tài liệu nhạy cảm)</td><td><span class="priority-high">Cao</span></td><td>Trung bình</td><td>Encryption at rest + in transit. ACL strict per-user. Audit log.</td></tr>
+<tr><td>Người dùng không chấp nhận chat AI</td><td><span class="priority-medium">TB</span></td><td>Thấp</td><td>Cho phép tắt AI trong chat. AI hỗ trợ, không thay thế con người.</td></tr>
+<tr><td>Tích hợp Asterisk phức tạp</td><td><span class="priority-medium">TB</span></td><td>Trung bình</td><td>Pilot với 1 user trước. Dùng Asterisk ARI REST API.</td></tr>
+<tr><td>Trễ tiến độ giai đoạn</td><td><span class="priority-medium">TB</span></td><td>Trung bình</td><td>Review sprint 2 tuần/lần. Feature freeze mỗi giai đoạn.</td></tr>
+</table>
+
+<div class="footer">
+  <p>Báo cáo này được tạo tự động | Dự án Quản lý Văn bản Thông minh | Ngày 16/09/2026</p>
+  <p>© 2026 — Dựa trên nền tảng Nextcloud v34.0.4 + Astrolabe AI Search</p>
+</div>
+
+</body>
+</html>

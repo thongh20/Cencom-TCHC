@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Nextcloud v34 — Tìm Kiếm Văn Bản &amp; AI</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0d1117; color: #e6edf3; padding: 24px; }
+  h1 { text-align: center; font-size: 1.8em; color: #00d2ff; margin-bottom: 6px; }
+  .sub { text-align: center; color: #8b949e; margin-bottom: 28px; }
+
+  .section { margin-bottom: 32px; }
+  .section-title { font-size: 1.1em; font-weight: 700; color: #58a6ff; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid #21262d; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 14px 16px; transition: border-color .2s; }
+  .card:hover { border-color: #58a6ff; }
+  .card .name { font-weight: 700; font-size: 1.05em; margin-bottom: 6px; }
+  .card .desc { color: #8b949e; font-size: .88em; line-height: 1.4; }
+
+  .flow { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; margin: 16px 0; }
+  .flow-node { background: #161b22; border: 2px solid #30363d; border-radius: 12px; padding: 14px 20px; text-align: center; min-width: 130px; }
+  .flow-node.primary { border-color: #1f6feb; }
+  .flow-node.warn { border-color: #d29922; }
+  .flow-node.danger { border-color: #f85149; }
+  .flow-node.success { border-color: #238636; }
+  .flow-node .icon { font-size: 1.6em; }
+  .flow-node .label { font-weight: 700; margin-top: 4px; font-size: .9em; }
+  .flow-node .detail { font-size: .75em; color: #8b949e; margin-top: 2px; }
+  .arrow { color: #484f58; font-size: 1.5em; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #21262d; font-size: .9em; }
+  th { color: #58a6ff; font-weight: 700; }
+  td { color: #c9d1d9; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: .78em; font-weight: 600; }
+  .badge.green { background: #238636; color: #fff; }
+  .badge.blue { background: #1f6feb; color: #fff; }
+  .badge.orange { background: #d29922; color: #000; }
+  .badge.red { background: #f85149; color: #fff; }
+  .badge.gray { background: #30363d; color: #c9d1d9; }
+  .badge.purple { background: #8957e5; color: #fff; }
+
+  code { background: #21262d; padding: 2px 6px; border-radius: 4px; color: #79c0ff; font-size: .85em; }
+</style>
+</head>
+<body>
+
+<h1>🤖 Nextcloud v34 — Tìm Kiếm Văn Bản &amp; AI</h1>
+<p class="sub">Quản lý văn bản • Tìm kiếm thông minh • Phân tích AI</p>
+
+<!-- ==================== ASTROLABE ==================== -->
+<div class="section">
+  <div class="section-title">🧠 Astrolabe — AI Semantic Search (App chính)</div>
+  <div class="card" style="border-color: #8957e5; margin-bottom: 16px;">
+    <div class="name" style="color:#8957e5;">🔍 AI-powered semantic search across your Nextcloud</div>
+    <div class="desc">Tìm nội dung theo <strong>nghĩa</strong> (semantic), không chỉ từ khóa. Kết nối MCP Server để vector hóa và phân tích tài liệu bằng AI. Source: <code>apps/astrolabe</code></div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="name" style="color:#58a6ff;">📝 Semantic Search</div>
+      <div class="desc">Tìm kiếm across Notes, Files, Calendar, Deck, Mail, Contacts, News bằng ngôn ngữ tự nhiên: "họp tuần trước", "công thức gà".</div>
+    </div>
+    <div class="card">
+      <div class="name" style="color:#238636;">🔎 Hybrid Search</div>
+      <div class="desc">Kết hợp <strong>Semantic</strong> (vector) + <strong>BM25</strong> (keyword) + <strong>Hybrid</strong> để tối ưu kết quả. Thuật toán per-document.</div>
+    </div>
+    <div class="card">
+      <div class="name" style="color:#d29922;">📊 Vector Visualization</div>
+      <div class="desc">Trực quan hóa nội dung trong không gian 2D (PCA plot). Khám phá mối quan hệ ngữ nghĩa giữa các tài liệu.</div>
+    </div>
+    <div class="card">
+      <div class="name" style="color:#f85149;">🤖 Agent Chat</div>
+      <div class="desc">Chatbot AI với tool-calling (AgentLoop). Đọc tài liệu → trả lời có trích dẫn nguồn. Read-only by construction.</div>
+    </div>
+    <div class="card">
+      <div class="name" style="color:#8957e5;">📋 Summary (Tóm tắt)</div>
+      <div class="desc">2 chế độ: <code>text2text</code> (văn bản) và <code>analyze-images</code> (multimodal — giữ nguyên bảng, biểu đồ, chữ viết tay).</div>
+    </div>
+    <div class="card">
+      <div class="name" style="color:#00d2ff;">🔗 Unified Search</div>
+      <div class="desc">Kết quả hiện trong thanh tìm kiếm toàn cục Nextcloud cùng kết quả truyền thống. <code>SemanticSearchProvider</code> implements <code>IProvider</code>.</div>
+    </div>
+    <div class="card">
+      <div class="name" style="color:#3fb950;">📑 Citation (Trích dẫn)</div>
+      <div class="desc">Mỗi câu trả lời AI đều kèm nguồn trích dẫn (max 10 citations/turn). Trích dẫn link trực tiếp đến passage cụ thể.</div>
+    </div>
+    <div class="card">
+      <div class="name" style="color:#e3b341;">🔄 Background Indexing</div>
+      <div class="desc">Tự động lập chỉ mục qua WebDAV + sync events. Webhook presets cho File, Deck, System-tag tạo chỉ mục realtime.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ASTROLABE ARCHITECTURE ==================== -->
+<div class="section">
+  <div class="section-title">🏗️ Kiến trúc Astrolabe</div>
+  <div class="flow">
+    <div class="flow-node">
+      <div class="icon">👤</div>
+      <div class="label">User Query</div>
+      <div class="detail">Natural language</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node primary">
+      <div class="icon">🔍</div>
+      <div class="label">Unified Search</div>
+      <div class="detail">SemanticSearchProvider</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node warn">
+      <div class="icon">🧩</div>
+      <div class="label">MCP Server</div>
+      <div class="detail">Vector search API</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node success">
+      <div class="icon">🤖</div>
+      <div class="label">AI Model</div>
+      <div class="detail">TaskProcessing Provider</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node">
+      <div class="icon">📋</div>
+      <div class="label">Answer + Citations</div>
+      <div class="detail">CitationCollector</div>
+    </div>
+  </div>
+  <p style="text-align:center;font-size:.82em;color:#8b949e;margin-top:8px;">
+    Astrolabe cung cấp <strong>retrieval</strong> (truy xuất), không phải generation (sinh văn bản). AI model đến từ TaskProcessing provider (llm2, OpenAI, Ollama…)
+  </p>
+</div>
+
+<!-- ==================== SEARCH SOURCES ==================== -->
+<div class="section">
+  <div class="section-title">📚 7 Nguồn dữ liệu được tìm kiếm</div>
+  <div class="grid">
+    <div class="card"><div class="name">📝 Notes</div><div class="desc"><code>doc_type: note</code> — Markdown files</div></div>
+    <div class="card"><div class="name">📁 Files</div><div class="desc"><code>doc_type: file</code> — File attachments</div></div>
+    <div class="card"><div class="name">🗂️ Deck</div><div class="desc"><code>doc_type: deck_card</code> — Kanban cards</div></div>
+    <div class="card"><div class="name">📰 News</div><div class="desc"><code>doc_type: news_item</code> — Feed items</div></div>
+    <div class="card"><div class="name">✉️ Mail</div><div class="desc"><code>doc_type: mail_message</code> — Email messages</div></div>
+    <div class="card"><div class="name">📅 Calendar</div><div class="desc"><code>doc_type: calendar</code> — Events</div></div>
+    <div class="card"><div class="name">👥 Contacts</div><div class="desc"><code>doc_type: contact</code> — vCards</div></div>
+  </div>
+  <p style="font-size:.83em;color:#8b949e;margin-top:8px;">
+    <strong>Admin</strong> bật/tắt nguồn (admin consent) → <strong>User</strong> thu hẹp trong phạm vi được phép. 2 lớp kiểm soát qua <code>SearchSources</code> + <code>DocumentAccessService</code>.
+  </p>
+</div>
+
+<!-- ==================== SEARCH ALGORITHMS ==================== -->
+<div class="section">
+  <div class="section-title">⚙️ 3 Thuật toán tìm kiếm</div>
+  <div class="grid">
+    <div class="card">
+      <div class="name">🔵 Semantic</div>
+      <div class="desc">Tìm theo nghĩa — so sánh vector embeddings. Kết quả dựa trên khoảng cách ngữ nghĩa, không cần khớp từ khóa.</div>
+    </div>
+    <div class="card">
+      <div class="name">🟡 BM25</div>
+      <div class="desc">Tìm keyword — thuật toán truyền thống, chính xác với từ khóa cụ thể. Tốt cho tên file, số điện thoại, mã…</div>
+    </div>
+    <div class="card">
+      <div class="name">🟣 Hybrid</div>
+      <div class="desc">Kết hợp cả 2 — re-rank kết quả semantic + BM25. Mặc định và được khuyến nghị.</div>
+    </div>
+  </div>
+  <div class="config-list">
+    <ul>
+      <li><strong>Per-document keyword index:</strong> Dựa vào tag <code>vector-index</code> — file nào có tag = dùng keyword index</li>
+      <li><strong>Server advertises:</strong> <code>["semantic", "bm25", "hybrid"]</code> hoặc <code>[]</code> (vector sync off)</li>
+      <li><strong>Client-side guard:</strong> <code>SearchCapabilities</code> kiểm tra server có hỗ trợ thuật toán không → UI chỉ hiện lựa chọn hợp lệ</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==================== DOCUMENT ACCESS ==================== -->
+<div class="section">
+  <div class="section-title">🛡️ Kiểm soát quyền truy cập tài liệu</div>
+  <div class="flow">
+    <div class="flow-node">
+      <div class="icon">📄</div>
+      <div class="label">Search Result</div>
+      <div class="detail">doc_type + id + metadata</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node warn">
+      <div class="icon">🔍</div>
+      <div class="label">DocumentAccessService</div>
+      <div class="detail">Route to verifier</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node primary">
+      <div class="icon">✅/❌</div>
+      <div class="label">AccessVerifier</div>
+      <div class="detail">File / Deck / Mail / Calendar</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node success">
+      <div class="icon">📋</div>
+      <div class="label">Result</div>
+      <div class="detail">ALLOWED / DENIED / DELEGATE</div>
+    </div>
+  </div>
+  <div class="config-list">
+    <ul>
+      <li><strong>FileAccessVerifier:</strong> <code>getUserFolder($uid)->getById($fileId)</code> — real-time, fail-closed (DENIED nếu lỗi)</li>
+      <li><strong>DeckAccessVerifier:</strong> <code>DELEGATE</code> (chưa có verifier — delegate cho MCP backstop)</li>
+      <li><strong>MailAccessVerifier:</strong> <code>DELEGATE</code> (conservative — delegate cho MCP)</li>
+      <li><strong>CalendarAccessVerifier:</strong> <code>DELEGATE</code> (cần identifier cross-check)</li>
+      <li><strong>Dynamic gate:</strong> Chỉ verify khi source app được cài đặt cho user (qua <code>SearchSources::isInstalled</code>)</li>
+      <li><strong>AccessDeniedResponse:</strong> 403 + <code>{error: "You no longer have access", code: "access_denied"}</code> nếu bị thu hồi share sau khi index</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==================== AGENT LOOP ==================== -->
+<div class="section">
+  <div class="section-title">🤖 Agent Loop (Chat AI)</div>
+  <div class="card" style="border-color:#8957e5; margin-bottom:16px;">
+    <div class="name" style="color:#8957e5;">Read-only agent — An toàn bởi thiết kế</div>
+    <div class="desc">Token minted với <strong>read scopes</strong>. MCP server lọc <code>tools/list</code> theo scope → model không bao giờ được đề xuất tool ghi. Không cần round-trip xác nhận.</div>
+  </div>
+  <div class="grid">
+    <div class="card">
+      <div class="name">🔄 Loop</div>
+      <div class="desc">Model → Tool call → Result → Model → dừng khi không cần tool. Max 20 history turns.</div>
+    </div>
+    <div class="card">
+      <div class="name">📏 Budget</div>
+      <div class="desc">MAX_TOOL_RESULT_CHARS = 8000 — giới hạn context bloat (mô tả dir, base64…).</div>
+    </div>
+    <div class="card">
+      <div class="name">🧠 Model</div>
+      <div class="desc"><code>core:text2text:chatwithtools</code> — Nextcloud model, tool-calling capable.</div>
+    </div>
+    <div class="card">
+      <div class="name">🧹 Cleanup</div>
+      <div class="desc">ExpireAgentConversationsJob — xóa transcript 30 ngày tuổi.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SUMMARY ==================== -->
+<div class="section">
+  <div class="section-title">📋 Document Summary (Tóm tắt tài liệu)</div>
+  <div class="flow">
+    <div class="flow-node">
+      <div class="icon">📄</div>
+      <div class="label">Document</div>
+      <div class="detail">Chunk/page</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node warn">
+      <div class="icon">🔪</div>
+      <div class="label">Chunk Split</div>
+      <div class="detail">start/end/chunk_index</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node">
+      <div class="icon">🖼️</div>
+      <div class="label">Render</div>
+      <div class="detail">Client-side (PDF → PNG)</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node success">
+      <div class="icon">🤖</div>
+      <div class="label">AI Summary</div>
+      <div class="detail">TaskProcessing task</div>
+    </div>
+  </div>
+  <div class="grid">
+    <div class="card">
+      <div class="name">📝 Text Mode</div>
+      <div class="desc"><code>core:text2text:summary</code> — từ văn bản đã trích. Fallback mặc định.</div>
+    </div>
+    <div class="card">
+      <div class="name">🖼️ Image Mode</div>
+      <div class="desc"><code>core:analyze-images</code> — đa mode (multimodal). Giữ nguyên bảng, biểu đồ, chữ viết tay. Max 8 trang/request.</div>
+    </div>
+  </div>
+  <div class="config-list">
+    <ul>
+      <li><strong>Rate-limited:</strong> 20 requests/60 phút</li>
+      <li><strong>Async:</strong> Trả về task_id → client poll <code>/ocs/v2.php/taskprocessing/task/{id}</code></li>
+      <li><strong>Scratch cleanup:</strong> SummaryCleanupListener xóa ảnh tạm khi task hoàn thành</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==================== SYNC & INDEXING ==================== -->
+<div class="section">
+  <div class="section-title">🔄 Background Sync &amp; Indexing</div>
+  <div class="grid">
+    <div class="card">
+      <div class="name">📡 SyncEventListener</div>
+      <div class="desc">Lắng nghe sự kiện thay đổi → gửi webhook đến MCP server để re-index realtime.</div>
+    </div>
+    <div class="card">
+      <div class="name">🔗 Webhook Presets</div>
+      <div class="desc">File created/updated/deleted, SystemTag MapperEvent, Deck card events → vector index update.</div>
+    </div>
+    <div class="card">
+      <div class="name">📊 Vector Sync Status</div>
+      <div class="desc"><code>GET /api/vector-status</code> — kiểm tra vector sync có đang bật không.</div>
+    </div>
+    <div class="card">
+      <div class="name">🧹 SweepJob</div>
+      <div class="desc">SweepSummaryScratchJob — dọn dẹp trang tóm tắt bị bỏ quên.</div>
+    </div>
+  </div>
+  <div class="config-list">
+    <ul>
+      <li><strong>Webhook events:</strong> <code>NodeCreatedEvent</code>, <code>NodeWrittenEvent</code>, <code>BeforeNodeDeletedEvent</code>, <code>MapperEvent</code> (system tag), Deck events</li>
+      <li><strong>Fallback:</strong> Khi webhook không hỗ trợ (Contacts, Calendar) → dùng polling scanner (CardDAV sync-token)</li>
+      <li><strong>Credential:</strong> McpTokenMinter mint JWT short-lived từ Nextcloud session → OIDC (internal/external IdP)</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==================== SEARCH PROVIDERS ==================== -->
+<div class="section">
+  <div class="section-title">🔍 Các Search Provider trong Nextcloud</div>
+  <table>
+    <thead>
+      <tr><th>App</th><th>Provider</th><th>Loại tìm kiếm</th><th>Mô tả</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Astrolabe</strong></td>
+        <td><code>SemanticSearchProvider</code></td>
+        <td><span class="badge purple">Semantic/Hybrid</span></td>
+        <td>AI vector search qua MCP Server</td>
+      </tr>
+      <tr>
+        <td><strong>Files</strong></td>
+        <td><code>FilesSearchProvider</code></td>
+        <td><span class="badge blue">Keyword</span></td>
+        <td>Tìm file/thư mục theo tên, nội dung</td>
+      </tr>
+      <tr>
+        <td><strong>DAV</strong></td>
+        <td><code>ACalendarSearchProvider</code></td>
+        <td><span class="badge blue">Keyword</span></td>
+        <td>Tìm lịch/sự kiện (CalDAV)</td>
+      </tr>
+      <tr>
+        <td><strong>DAV</strong></td>
+        <td><code>EventsSearchProvider</code></td>
+        <td><span class="badge blue">Keyword</span></td>
+        <td>Tìm sự kiện</td>
+      </tr>
+      <tr>
+        <td><strong>DAV</strong></td>
+        <td><code>ContactsSearchProvider</code></td>
+        <td><span class="badge blue">Keyword</span></td>
+        <td>Tìm danh bạ (CardDAV)</td>
+      </tr>
+      <tr>
+        <td><strong>DAV</strong></td>
+        <td><code>TasksSearchProvider</code></td>
+        <td><span class="badge blue">Keyword</span></td>
+        <td>Tìm task (CalDAV)</td>
+      </tr>
+      <tr>
+        <td><strong>Comments</strong></td>
+        <td><code>CommentsSearchProvider</code></td>
+        <td><span class="badge blue">Keyword</span></td>
+        <td>Tìm comment trên tệp</td>
+      </tr>
+      <tr>
+        <td><strong>Appstore</strong></td>
+        <td><code>AppSearch</code></td>
+        <td><span class="badge blue">Keyword</span></td>
+        <td>Tìm ứng dụng</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ==================== OCR ==================== -->
+<div class="section">
+  <div class="section-title">🖨️ Workflow OCR — Trích văn bản từ ảnh/PDF</div>
+  <div class="flow">
+    <div class="flow-node">
+      <div class="icon">📤</div>
+      <div class="label">Upload File</div>
+      <div class="detail">Image / PDF</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node warn">
+      <div class="icon">⚙️</div>
+      <div class="label">Workflow Rule</div>
+      <div class="detail">Match condition</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node success">
+      <div class="icon">👁️</div>
+      <div class="label">OCR Process</div>
+      <div class="detail">Tesseract / Remote API</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node">
+      <div class="icon">📋</div>
+      <div class="label">Tag + Result</div>
+      <div class="detail">TextRecognizedEvent</div>
+    </div>
+  </div>
+  <div class="grid">
+    <div class="card">
+      <div class="name">📷 ImageOCR</div>
+      <div class="desc"><code>ImageOcrProcessor.php</code> — OCR ảnh (JPG/PNG…) qua Tesseract CLI</div>
+    </div>
+    <div class="card">
+      <div class="name">📄 PdfOCR</div>
+      <div class="desc"><code>PdfOcrProcessor.php</code> — OCR PDF qua <code>OcrMyPDF</code> CLI</div>
+    </div>
+    <div class="card">
+      <div class="name">🌐 Remote OCR</div>
+      <div class="desc"><code>RemoteWorkflowOcrProcessor.php</code> — OCR qua API external (để nâng cao)</div>
+    </div>
+    <div class="card">
+      <div class="name">📡 ProcessFileJob</div>
+      <div class="desc"><code>BackgroundJob/QueuedJob</code> — xử lý OCR background queue</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CONFIGURATION ==================== -->
+<div class="section">
+  <div class="section-title">⚙️ Cấu hình chính</div>
+  <div class="config-list">
+    <ul>
+      <li><code>mcp_server_url</code> — Địa chỉ MCP Server (mặc định: http://localhost:8000)</li>
+      <li><code>mcp_webhook_secret</code> — Shared secret cho webhook ingress</li>
+      <li><code>astrolabe.agent.enabled</code> — Bật/tắt Agent Chat (admin)</li>
+      <li><code>astrolabe.visualization.enabled</code> — Bật/tắt Vector Visualization (admin)</li>
+      <li><code>astrolabe.sources.enabled</code> — Các nguồn dữ liệu được phép (admin)</li>
+      <li><code>user_disabled_search_sources</code> — User thu hẹp nguồn tìm kiếm (JSON)</li>
+      <li><code>shareapi_default_permissions</code> — Quyền mặc định khi tạo share</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==================== KEY CLASSES ==================== -->
+<div class="section">
+  <div class="section-title">📦 Key Classes &amp; Files</div>
+  <table>
+    <thead><tr><th>Class</th><th>File</th><th>Chức năng</th></tr></thead>
+    <tbody>
+      <tr><td>Astrolabe App</td><td><code>apps/astrolabe/</code></td><td>App chính — semantic search + AI assistant</td></tr>
+      <tr><td><code>SemanticSearchProvider</code></td><td><code>lib/Search/SemanticSearchProvider.php</code></td><td>Unified Search provider (IProvider)</td></tr>
+      <tr><td><code>AgentLoop</code></td><td><code>lib/Service/Assistant/AgentLoop.php</code></td><td>Agent chat loop (read-only)</td></tr>
+      <tr><td><code>SummaryService</code></td><td><code>lib/Service/Assistant/SummaryService.php</code></td><td>Schedule document summary</td></tr>
+      <tr><td><code>CitationCollector</code></td><td><code>lib/Service/Assistant/CitationCollector.php</code></td><td>Harvest citations from tool results</td></tr>
+      <tr><td><code>AssistantCapabilities</code></td><td><code>lib/Service/Assistant/AssistantCapabilities.php</code></td><td>Check AI availability (agent/summary)</td></tr>
+      <tr><td><code>SearchSources</code></td><td><code>lib/Service/SearchSources.php</code></td><td>7 source catalog + admin consent</td></tr>
+      <tr><td><code>DocumentAccessService</code></td><td><code>lib/Service/Access/DocumentAccessService.php</code></td><td>Route doc → verifier</td></tr>
+      <tr><td><code>FileAccessVerifier</code></td><td><code>lib/Service/Access/FileAccessVerifier.php</code></td><td>Real-time file access check</td></tr>
+      <tr><td><code>McpServerClient</code></td><td><code>lib/Service/McpServerClient.php</code></td><td>HTTP client → MCP server API</td></tr>
+      <tr><td><code>McpTokenMinter</code></td><td><code>lib/Service/McpTokenMinter.php</code></td><td>Mint JWT from session (OIDC)</td></tr>
+      <tr><td><code>SearchCapabilities</code></td><td><code>lib/Service/SearchCapabilities.php</code></td><td>Guard: supported algorithms</td></tr>
+      <tr><td><code>Operation (OCR)</code></td><td><code>apps/workflow_ocr/lib/Operation.php</code></td><td>Workflow OCR operation</td></tr>
+      <tr><td><code>ProcessFileJob</code></td><td><code>apps/workflow_ocr/lib/BackgroundJobs/</code></td><td>OCR background job</td></tr>
+      <tr><td><code>Capabilities</code></td><td><code>apps/astrolabe/lib/Capabilities.php</code></td><td>OCS capabilities: sources + AI</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ==================== FLOW SUMMARY ==================== -->
+<div class="section">
+  <div class="section-title">🔄 Tổng quan Flow</div>
+  <div class="flow">
+    <div class="flow-node primary">
+      <div class="icon">🌐</div>
+      <div class="label">User Types</div>
+      <div class="detail">"Meeting notes last week"</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node">
+      <div class="icon">🔍</div>
+      <div class="label">Search Bar</div>
+      <div class="detail">Unified Search</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node primary">
+      <div class="icon">🧩</div>
+      <div class="label">SemanticSearchProvider</div>
+      <div class="detail">→ MCP Server (vector search)</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node success">
+      <div class="icon">📊</div>
+      <div class="label">Hybrid Results</div>
+      <div class="detail">Semantic + BM25 re-rank</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node warn">
+      <div class="icon">🛡️</div>
+      <div class="label">Access Check</div>
+      <div class="detail">DocumentAccessService</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node">
+      <div class="icon">✅</div>
+      <div class="label">Results</div>
+      <div class="detail">Only accessible docs</div>
+    </div>
+  </div>
+  <div class="flow" style="margin-top:8px;">
+    <div class="flow-node primary">
+      <div class="icon">💬</div>
+      <div class="label">Agent Chat</div>
+      <div class="detail">"Summarize this"</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node warn">
+      <div class="icon">🤖</div>
+      <div class="label">AgentLoop</div>
+      <div class="detail">model → tools → model</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node success">
+      <div class="icon">📋</div>
+      <div class="label">Answer + Citations</div>
+      <div class="detail">CitationCollector (max 10)</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

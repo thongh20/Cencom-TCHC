@@ -1,0 +1,19 @@
+services:
+  nextcloud:
+    image: nextcloud:apache
+    container_name: nextcloud-server
+    restart: unless-stopped
+    ports:
+      - "8085:80"
+    volumes:
+      - ./:/var/www/html
+    environment:
+      - NEXTCLOUD_TRUSTED_DOMAINS=localhost 127.0.0.1
+
+  mcp-server:
+    image: ghcr.io/cbcoutinho/nextcloud-mcp-server:latest
+    container_name: nextcloud-mcp-server
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    command: [ "--oauth" ]

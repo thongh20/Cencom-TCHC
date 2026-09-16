@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Nextcloud v34 — Luồng Phân Quyền &amp; Quyền Hạn Tài Khoản</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0d1117; color: #e6edf3; padding: 24px; }
+  h1 { text-align: center; font-size: 1.8em; color: #00d2ff; margin-bottom: 6px; }
+  .sub { text-align: center; color: #8b949e; margin-bottom: 28px; }
+
+  .section { margin-bottom: 32px; }
+  .section-title { font-size: 1.1em; font-weight: 700; color: #58a6ff; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid #21262d; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 14px 16px; transition: border-color .2s; }
+  .card:hover { border-color: #58a6ff; }
+  .card .name { font-weight: 700; font-size: 1.05em; margin-bottom: 6px; }
+  .card .desc { color: #8b949e; font-size: .88em; line-height: 1.4; }
+
+  /* Flow diagram */
+  .flow { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; margin: 16px 0; }
+  .flow-node { background: #161b22; border: 2px solid #30363d; border-radius: 12px; padding: 14px 20px; text-align: center; min-width: 130px; position: relative; }
+  .flow-node.primary { border-color: #1f6feb; }
+  .flow-node.warn { border-color: #d29922; }
+  .flow-node.danger { border-color: #f85149; }
+  .flow-node.success { border-color: #238636; }
+  .flow-node .icon { font-size: 1.6em; }
+  .flow-node .label { font-weight: 700; margin-top: 4px; font-size: .9em; }
+  .flow-node .detail { font-size: .75em; color: #8b949e; margin-top: 2px; }
+  .arrow { color: #484f58; font-size: 1.5em; }
+
+  /* Permission bits */
+  .perm-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid #21262d; }
+  .perm-row:last-child { border-bottom: none; }
+  .perm-bit { display: inline-block; width: 40px; text-align: center; font-weight: 700; font-size: .9em; background: #1f6feb; color: #fff; border-radius: 4px; padding: 2px 6px; }
+  .perm-name { font-weight: 600; }
+  .perm-desc { color: #8b949e; font-size: .85em; }
+
+  /* Role table */
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #21262d; font-size: .9em; }
+  th { color: #58a6ff; font-weight: 700; }
+  td { color: #c9d1d9; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: .78em; font-weight: 600; }
+  .badge.green { background: #238636; color: #fff; }
+  .badge.blue { background: #1f6feb; color: #fff; }
+  .badge.orange { background: #d29922; color: #000; }
+  .badge.red { background: #f85149; color: #fff; }
+  .badge.gray { background: #30363d; color: #c9d1d9; }
+
+  /* Share flow */
+  .share-types { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin: 12px 0; }
+  .share-type-card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 12px; text-align: center; }
+  .share-type-card .icon { font-size: 1.8em; }
+  .share-type-card .name { font-weight: 700; margin-top: 4px; }
+  .share-type-card .desc { font-size: .8em; color: #8b949e; margin-top: 4px; }
+
+  .config-list { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 16px; margin: 12px 0; }
+  .config-list code { background: #21262d; padding: 2px 6px; border-radius: 4px; color: #79c0ff; font-size: .85em; }
+  .config-list li { margin-bottom: 6px; font-size: .9em; }
+
+  @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<h1>🔐 Nextcloud v34 — Phân Quyền &amp; Quyền Hạn</h1>
+<p class="sub">Luồng hoạt động • Cấp tài khoản • Quyền chia sẻ</p>
+
+<!-- ==================== ROLE HIERARCHY ==================== -->
+<div class="section">
+  <div class="section-title">👥 Thứ bậc tài khoản (4 cấp)</div>
+  <div class="grid">
+    <div class="card" style="border-color: #f85149;">
+      <div class="name" style="color:#f85149;">🏢 Super Admin</div>
+      <div class="desc">Chủ sở hữu instance. Toàn quyền truy cập mọi cài đặt, quản trị viên cấp cao nhất. Được xác định qua nhóm <code>admin</code>.</div>
+      <div style="margin-top:8px;"><span class="badge red">Toàn quyền</span></div>
+    </div>
+    <div class="card" style="border-color: #d29922;">
+      <div class="name" style="color:#d29922;">👔 Sub-Admin (Quản trị viên phân cấp)</div>
+      <div class="desc">Quản lý người dùng trong nhóm được phân công. KHÔNG truy cập cài đặt toàn hệ thống. Được cấu hình qua <code>subadmin</code> groups.</div>
+      <div style="margin-top:8px;"><span class="badge orange">Hạn chế</span></div>
+    </div>
+    <div class="card" style="border-color: #1f6feb;">
+      <div class="name" style="color:#1f6feb;">👤 User (Người dùng)</div>
+      <div class="desc">Tài khoản cá nhân bình thường. Có quyền truy cập files, calendar, share… trong phạm vi cá nhân + các group share.</div>
+      <div style="margin-top:8px;"><span class="badge blue">Cá nhân</span></div>
+    </div>
+    <div class="card" style="border-color: #30363d;">
+      <div class="name" style="color:#8b949e;">👁️ Guest (Khách)</div>
+      <div class="desc">Truy cập qua public link (đã xác thực hoặc không). Phân quyền qua share permissions (READ/CREATE/UPDATE/DELETE/SHARE).</div>
+      <div style="margin-top:8px;"><span class="badge gray">Public link</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PERMISSION HIERARCHY ==================== -->
+<div class="section">
+  <div class="section-title">🧩 Quyền hạn chia sẻ (Permission Bits)</div>
+  <div style="background:#161b22;border:1px solid #30363d;border-radius:12px;padding:16px 20px;">
+    <p style="margin-bottom:12px;font-size:.85em;color:#8b949e;">Định nghĩa trong <code>OCP\Constants</code>:</p>
+    <div class="perm-row">
+      <span class="perm-bit">1</span>
+      <div><div class="perm-name">PERMISSION_READ</div><div class="perm-desc">Đọc, tải xuống, xem</div></div>
+    </div>
+    <div class="perm-row">
+      <span class="perm-bit">2</span>
+      <div><div class="perm-name">PERMISSION_UPDATE</div><div class="perm-desc">Chỉnh sửa, đổi tên, di chuyển</div></div>
+    </div>
+    <div class="perm-row">
+      <span class="perm-bit">4</span>
+      <div><div class="perm-name">PERMISSION_CREATE</div><div class="perm-desc">Tạo file/thư mục mới (upload)</div></div>
+    </div>
+    <div class="perm-row">
+      <span class="perm-bit">8</span>
+      <div><div class="perm-name">PERMISSION_DELETE</div><div class="perm-desc">Xóa file/thư mục</div></div>
+    </div>
+    <div class="perm-row">
+      <span class="perm-bit">16</span>
+      <div><div class="perm-name">PERMISSION_SHARE</div><div class="perm-desc">Chia sẻ lại cho người khác</div></div>
+    </div>
+    <div class="perm-row" style="border-bottom:none;">
+      <span class="perm-bit">31</span>
+      <div><div class="perm-name">PERMISSION_ALL</div><div class="perm-desc">Tất cả (1+2+4+8+16)</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== AUTH FLOW ==================== -->
+<div class="section">
+  <div class="section-title">🔄 Luồng xác thực &amp; phân quyền</div>
+  <div class="flow">
+    <div class="flow-node">
+      <div class="icon">🌐</div>
+      <div class="label">Request</div>
+      <div class="detail">HTTP request đến Nextcloud</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node primary">
+      <div class="icon">🔑</div>
+      <div class="label">Auth Check</div>
+      <div class="detail">Session token / OAuth2 / WebAuthn</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node warn">
+      <div class="icon">🛡️</div>
+      <div class="label">Middleware</div>
+      <div class="detail">Admin? SubAdmin? Brute-force?</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node primary">
+      <div class="icon">📡</div>
+      <div class="label">Controller</div>
+      <div class="detail">Xử lý request theo route</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node success">
+      <div class="icon">💾</div>
+      <div class="label">DB / Filesystem</div>
+      <div class="detail">MySQL/PostgreSQL + Mount Points</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MIDDLEWARE ==================== -->
+<div class="section">
+  <div class="section-title">🛡️ Middleware kiểm soát truy cập</div>
+  <div class="grid">
+    <div class="card">
+      <div class="name">🔒 <code>RequireAdmin</code></div>
+      <div class="desc">Chỉ Super Admin mới truy cập được. Dùng cho các trang cài đặt toàn hệ thống.</div>
+    </div>
+    <div class="card">
+      <div class="name">👥 <code>SubAdminRequired</code></div>
+      <div class="desc">Chỉ SubAdmin (quản lý nhóm) mới truy cập. Dùng cho quản lý user trong nhóm. <span style="color:#d29922;">→ <code>SubadminMiddleware.php</code></span></div>
+    </div>
+    <div class="card">
+      <div class="name">🌍 <code>NoAdminRequired</code></div>
+      <div class="desc">Bỏ kiểm tra admin — cho phép User/Guest truy cập. Dùng cho API public share, chat…</div>
+    </div>
+    <div class="card">
+      <div class="name">🚫 <code>NoSubAdminRequired</code></div>
+      <div class="desc">Bỏ kiểm tra sub-admin — cho phép cả admin và user truy cập.</div>
+    </div>
+    <div class="card">
+      <div class="name">🛑 <code>BruteForceProtection</code></div>
+      <div class="desc">Chặn sau N lần đăng nhập sai. Giới hạn rate: <code>UserRateLimit</code> (ví dụ: 20 req/10 phút).</div>
+    </div>
+    <div class="card">
+      <div class="name">🔐 <code>AuthorizedAdminSetting</code></div>
+      <div class="desc">Thuộc tính trên method cho phép SubAdmin truy cập cài đặt này (miễn là họ thuộc nhóm được ủy quyền).</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SHARE FLOW ==================== -->
+<div class="section">
+  <div class="section-title">📤 Luồng chia sẻ (Share Flow)</div>
+  <div class="flow">
+    <div class="flow-node primary">
+      <div class="icon">📁</div>
+      <div class="label">Owner tạo Share</div>
+      <div class="detail">ShareAPI#createShare</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node warn">
+      <div class="icon">⚙️</div>
+      <div class="label">Permissions Check</div>
+      <div class="detail">READ|CREATE|UPDATE|DELETE|SHARE</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node success">
+      <div class="icon">📤</div>
+      <div class="label">4 loại Share</div>
+      <div class="detail">User / Group / Link / Remote</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node">
+      <div class="icon">📥</div>
+      <div class="label">Recipient Nhận</div>
+      <div class="detail">Email / Notification / Direct</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node">
+      <div class="icon">✅</div>
+      <div class="label">Accept</div>
+      <div class="detail">AcceptController#accept</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SHARE TYPES ==================== -->
+<div class="section">
+  <div class="section-title">📤 4 loại Share trong Nextcloud</div>
+  <div class="share-types">
+    <div class="share-type-card">
+      <div class="icon">👤</div>
+      <div class="name">User Share</div>
+      <div class="desc">Chia sẻ trực tiếp với 1 người dùng. Owner quản lý toàn bộ.</div>
+    </div>
+    <div class="share-type-card">
+      <div class="icon">👥</div>
+      <div class="name">Group Share</div>
+      <div class="desc">Chia sẻ với cả nhóm. Recipients: tất cả member trong group.</div>
+    </div>
+    <div class="share-type-card">
+      <div class="icon">🔗</div>
+      <div class="name">Link Share (Public)</div>
+      <div class="desc">Link công khai. Cài đặt: password, expiration, publicUpload, mail.</div>
+    </div>
+    <div class="share-type-card">
+      <div class="icon">🌐</div>
+      <div class="name">Remote (Federated)</div>
+      <div class="desc">Chia sẻ qua server khác. Cloud Federation API. Server-to-Server.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SHARE CONTROLLER LOGIC ==================== -->
+<div class="section">
+  <div class="section-title">🔍 Quyền quản lý share (Share API Logic)</div>
+  <div style="background:#161b22;border:1px solid #30363d;border-radius:12px;padding:16px 20px;">
+    <p style="margin-bottom:12px;font-size:.85em;color:#8b949e;">File: <code>ShareAPIController.php</code></p>
+    <div class="card" style="margin-bottom:8px;border-color:#1f6feb;">
+      <div class="name">canEditShare($share)</div>
+      <div class="desc">✅ Owner file ($shareOwner === userId) → <strong>TRUE</strong><br/>
+      ✅ Người tạo share ($sharedBy === userId) → <strong>TRUE</strong><br/>
+      ❌ Người khác → <strong>FALSE</strong> (chỉ đọc)</div>
+    </div>
+    <div class="card" style="margin-bottom:8px;border-color:#d29922;">
+      <div class="name">canDeleteShare($share)</div>
+      <div class="desc">✅ Owner/người tạo → <strong>TRUE</strong><br/>
+      ✅ Recipient share type=User & sharedWith=me → <strong>TRUE</strong> (unshare)<br/>
+      ❌ Các trường hợp khác → <strong>FALSE</strong></div>
+    </div>
+    <div class="card" style="border-color:#f85149;">
+      <div class="name">canDeleteShareFromSelf($share)</div>
+      <div class="desc">⚠️ Group/Room/Deck share → KHÔNG xóa toàn bộ (chỉ gỡ self)<br/>
+      ⚠️ Single file share → KHÔNG xóa (dùng cách riêng)<br/>
+      ⚠️ File permissions = 0 → KHÔNG truy cập được</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ROLE PERMISSION TABLE ==================== -->
+<div class="section">
+  <div class="section-title">📊 Ma trận quyền hạn</div>
+  <div style="overflow-x:auto;">
+  <table>
+    <thead>
+      <tr>
+        <th>Tài khoản</th>
+        <th>Files</th>
+        <th>Share nội bộ</th>
+        <th>Public Link</th>
+        <th>Share mail</th>
+        <th>Federated</th>
+        <th>Cài đặt hệ thống</th>
+        <th>Quản lý User</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Super Admin</strong></td>
+        <td><span class="badge green">✓ Full</span></td>
+        <td><span class="badge green">✓</span></td>
+        <td><span class="badge green">✓ Cấu hình</span></td>
+        <td><span class="badge green">✓</span></td>
+        <td><span class="badge green">✓</span></td>
+        <td><span class="badge green">✓ Toàn quyền</span></td>
+        <td><span class="badge green">✓ Thêm/Xóa</span></td>
+      </tr>
+      <tr>
+        <td><strong>Sub-Admin</strong></td>
+        <td><span class="badge green">✓</span></td>
+        <td><span class="badge green">✓</span> (nhóm được ủy quyền)</td>
+        <td><span class="badge orange">✓ Cấu hình</span></td>
+        <td><span class="badge green">✓</span></td>
+        <td><span class="badge green">✓</span></td>
+        <td><span class="badge orange">✓ Hạn chế</span></td>
+        <td><span class="badge orange">✓ Chỉ nhóm</span></td>
+      </tr>
+      <tr>
+        <td><strong>User (thường)</strong></td>
+        <td><span class="badge blue">✓ Cá nhân</span></td>
+        <td><span class="badge blue">✓</span> (nếu được phép)</td>
+        <td><span class="badge blue">✓ (nếu bật)</span></td>
+        <td><span class="badge blue">✓ (nếu bật)</span></td>
+        <td><span class="badge blue">✓ (nếu bật)</span></td>
+        <td><span class="badge gray">✗</span></td>
+        <td><span class="badge gray">✗</span></td>
+      </tr>
+      <tr>
+        <td><strong>Guest (Public)</strong></td>
+        <td><span class="badge gray">Theo Share perms</span></td>
+        <td><span class="badge gray">✗</span></td>
+        <td><span class="badge gray">Chỉ link này</span></td>
+        <td><span class="badge gray">✗</span></td>
+        <td><span class="badge gray">✗</span></td>
+        <td><span class="badge gray">✗</span></td>
+        <td><span class="badge gray">✗</span></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- ==================== CONFIGURATION ==================== -->
+<div class="section">
+  <div class="section-title">⚙️ Cấu hình quyền chia sẻ (config.php)</div>
+  <div class="config-list">
+    <ul>
+      <li><code>shareapi_default_permissions</code> → Quyền mặc định khi tạo share (<code>31</code> = tất cả)</li>
+      <li><code>shareapi_allow_public_upload</code> → Cho phép upload qua public link</li>
+      <li><code>shareapi_allow_mail_notification</code> → Gửi email khi share</li>
+      <li><code>shareapi_allow_public_notification</code> → Gửi email công khai</li>
+      <li><code>shareapi_allow_socialshare</code> → Chia sẻ ra mạng xã hội</li>
+      <li><code>shareapi_max_autocomplete_results</code> → Giới hạn gợi ý khi share (mặc định 25)</li>
+      <li><code>shareapi_show_tags</code> → Hiển thị tags khi chọn file chia sẻ</li>
+      <li><code>sharing.minSharePathLength</code> / <code>sharing.maxSharePathLength</code> → Độ dài đường dẫn share</li>
+      <li><code>auth.bruteforce.maxAttempts</code> → Số lần đăng nhập sai tối đa</li>
+      <li><code>shareapi_default_expire_date</code> → Ngày hết hạn mặc định</li>
+      <li><code>shareapi_expire_after_n_days</code> → Số ngày hết hạn</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==================== LOGIN FLOW ==================== -->
+<div class="section">
+  <div class="section-title">🔐 Luồng đăng nhập &amp; bảo mật</div>
+  <div class="flow">
+    <div class="flow-node">
+      <div class="icon">📝</div>
+      <div class="label">Login</div>
+      <div class="detail">Username + Password</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node warn">
+      <div class="icon">🔍</div>
+      <div class="label">Brute-force Check</div>
+      <div class="detail">Throttler: IP + User</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node">
+      <div class="icon">🔑</div>
+      <div class="label">Password Verify</div>
+      <div class="detail">Hashed (bcrypt/argon2)</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node warn">
+      <div class="icon">📱</div>
+      <div class="label">2FA Check</div>
+      <div class="detail">TOTP / WebAuthn / Backup codes</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="flow-node success">
+      <div class="icon">✅</div>
+      <div class="label">Session Token</div>
+      <div class="detail">LoginToken in DB</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SHARE PERMISSION RULES ==================== -->
+<div class="section">
+  <div class="section-title">📜 Quy tắc tạo Share (Validation Rules)</div>
+  <div style="background:#161b22;border:1px solid #30363d;border-radius:12px;padding:16px 20px;">
+    <div class="config-list" style="border:none;padding:0;">
+      <ul>
+        <li>Share <strong>bắt buộc phải có</strong> READ hoặc CREATE</li>
+        <li>Nếu đặt UPDATE hoặc DELETE → <strong>bắt buộc phải có</strong> READ</li>
+        <li>File permissions = 0 → <strong>không truy cập được</strong></li>
+        <li>Single file share → <strong>không được xóa</strong> (dùng unshare thay vì delete)</li>
+        <li>Link share có thể đặt <strong>password + expiration date + publicUpload</strong></li>
+        <li>Enforced password → Admin có thể bắt buộc đặt password cho mọi link share</li>
+        <li>Enforced expiration → Admin có thể bắt buộc ngày hết hạn</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== BACKGROUND JOBS ==================== -->
+<div class="section">
+  <div class="section-title">🔄 Cron Jobs liên quan đến Share</div>
+  <div class="grid">
+    <div class="card">
+      <div class="name">🧹 ExpireSharesJob</div>
+      <div class="desc">Xóa tự động các share đã hết hạn.</div>
+    </div>
+    <div class="card">
+      <div class="name">📧 SharesReminderJob</div>
+      <div class="desc">Gửi nhắc nhở trước khi share hết hạn.</div>
+    </div>
+    <div class="card">
+      <div class="name">🗑️ DeleteOrphanedSharesJob</div>
+      <div class="desc">Xóa các share mồ côi (khi user/file bị xóa).</div>
+    </div>
+    <div class="card">
+      <div class="name">🌐 FederatedSharesDiscoverJob</div>
+      <div class="desc">Khám phá các share liên server.</div>
+    </div>
+    <div class="card">
+      <div class="name">🔍 ExternalShareScanJob</div>
+      <div class="desc">Quét các external share mount points.</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

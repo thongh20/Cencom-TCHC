@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Nextcloud Server 34 — Tổng quan tính năng</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0d1117; color: #e6edf3; padding: 24px; }
+  h1 { text-align: center; font-size: 2em; margin-bottom: 6px; color: #00d2ff; }
+  .sub { text-align: center; color: #8b949e; margin-bottom: 28px; }
+  .layer { margin-bottom: 28px; }
+  .layer-title { font-size: 1.1em; font-weight: 700; color: #58a6ff; margin-bottom: 10px; padding-bottom: 4px; border-bottom: 1px solid #21262d; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 14px 16px; transition: border-color .2s; }
+  .card:hover { border-color: #58a6ff; }
+  .card .icon { font-size: 1.4em; margin-right: 6px; }
+  .card .name { font-weight: 700; font-size: 1.05em; color: #e6edf3; }
+  .card .desc { color: #8b949e; font-size: .88em; margin-top: 4px; line-height: 1.4; }
+  .card .how { color: #3fb950; font-size: .82em; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #21262d; }
+
+  /* Top banner */
+  .banner { background: linear-gradient(135deg, #1a3a5c, #0d1117); border: 1px solid #1f6feb; border-radius: 14px; padding: 24px 32px; margin-bottom: 32px; display: flex; align-items: center; gap: 20px; }
+  .banner .cloud { font-size: 3.5em; }
+  .banner h2 { color: #fff; font-size: 1.5em; }
+  .banner p { color: #8b949e; font-size: .95em; margin-top: 4px; }
+
+  /* Architecture diagram */
+  .arch { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin: 24px 0; }
+  .arch-node { background: #161b22; border: 2px solid #30363d; border-radius: 12px; padding: 16px 20px; text-align: center; min-width: 130px; }
+  .arch-node.core { border-color: #1f6feb; }
+  .arch-node.app { border-color: #238636; }
+  .arch-node.ext { border-color: #d29922; }
+  .arch-node .label { font-weight: 700; margin-top: 6px; }
+  .arrow { display: flex; align-items: center; color: #484f58; font-size: 1.5em; }
+
+  @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<h1>☁ Nextcloud Server v34</h1>
+<p class="sub">Tổng quan tính năng &amp; cách thức hoạt động</p>
+
+<!-- Banner -->
+<div class="banner">
+  <div class="cloud">☁️</div>
+  <div>
+    <h2>Nền tảng tự lưu trữ dữ liệu cá nhân &amp; tổ chức</h2>
+    <p>Lưu trữ · Đồng bộ · Chia sẻ · Cộng tác · Bảo mật — Mở rộng qua 400+ ứng dụng</p>
+  </div>
+</div>
+
+<!-- Architecture overview -->
+<div class="layer">
+  <div class="layer-title">🏗️ Kiến trúc tổng quan</div>
+  <div class="arch">
+    <div class="arch-node core"><div style="font-size:2em">🖥️</div><div class="label">Nextcloud Core</div><div style="font-size:.75em;color:#8b949e">PHP + MySQL/PostgreSQL<br/>Web Server</div></div>
+    <div class="arrow">↕</div>
+    <div class="arch-node app"><div style="font-size:2em">📦</div><div class="label">Apps (30+ built-in)</div><div style="font-size:.75em;color:#8b949e">Calendar, Talk, Mail…</div></div>
+    <div class="arrow">↔</div>
+    <div class="arch-node ext"><div style="font-size:2em">🔌</div><div class="label">External Storage</div><div style="font-size:.75em;color:#8b949e">S3, FTP, WebDAV…</div></div>
+  </div>
+</div>
+
+<!-- CORE FEATURES -->
+<div class="layer">
+  <div class="layer-title">📁 Tính năng cốt lõi</div>
+  <div class="grid">
+    <div class="card">
+      <div><span class="icon">📁</span><span class="name">Files — Tệp tin</span></div>
+      <div class="desc">Quản lý thư mục, tải lên/tải xuống, lịch sử phiên bản, khóa tệp.</div>
+      <div class="how">▶ Web UI + WebDAV + Mobile App đồng bộ hai chiều</div>
+    </div>
+    <div class="card">
+      <div><span class="icon">🔄</span><span class="name">Sync — Đồng bộ</span></div>
+      <div class="desc">Đồng bộ tệp, lịch, danh bạ giữa máy tính và điện thoại.</div>
+      <div class="how">▶ Desktop/mobile client qua WebDAV + Delta sync</div>
+    </div>
+    <div class="card">
+      <div><span class="icon">🤝</span><span class="name">Sharing — Chia sẻ</span></div>
+      <div class="desc">Chia sẻ link, chia sẻ nội bộ, có hạn sử dụng &amp; mật khẩu.</div>
+      <div class="how">▶ Reshare API + federated sharing giữa các instance</div>
+    </div>
+    <div class="card">
+      <div><span class="icon">🔒</span><span class="name">Security — Bảo mật</span></div>
+      <div class="desc">Mã hóa (E2EE/at-rest), 2FA, brute-force protection, audit log.</div>
+      <div class="how">▶ Encryption app + 2FA providers + server-side rules</div>
+    </div>
+    <div class="card">
+      <div><span class="icon">🎨</span><span class="name">Theming — Giao diện</span></div>
+      <div class="desc">Tùy chỉnh logo, màu sắc, chính sách đăng nhập.</div>
+      <div class="how">▶ Admin panel → Theming app → CSS/SCSS overrides</div>
+    </div>
+    <div class="card">
+      <div><span class="icon">📊</span><span class="name">Dashboard — Bảng điều khiển</span></div>
+      <div class="desc">Widget: hoạt động gần đây, email, lịch, task…</div>
+      <div class="how">▶ Widget API (core) + per-user layout saved in DB</div>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCTIVITY APPS -->
+<div class="layer">
+  <div class="layer-title">📅 Ứng dụng năng suất</div>
+  <div class="grid">
+    <div class="card">
+      <div><span class="icon">📆</span><span class="name">Calendar — Lịch</span></div>
+      <div class="desc">Lịch cá nhân/nhóm, hỗ trợ CalDAV, nhắc nhở.</div>
+      <div class="how">▶ CalDAV server (cardcaldav) + Web UI (calendar app)</div>
+    </div>
+    <div class="card">
+      <div><span class="icon">👥</span><span class="name">Contacts — Danh bạ</span></div>
+      <div class="desc">Quản lý danh bạ, hỗ trợ vCard, CardDAV.</div>
+      <div class="how">▶ CardDAV server + addressbook app</div>
+    </div>
+    <div class="card">
+      <div><span class="icon">✉️</span><span class="name">Mail — Thư điện tử</span></div>
+      <div class="desc">IMAP client, gửi/nhận, quản lý thư mục, filter.</div>
+      <div class="how">▶ IMAP/SMTP via PHP + React UI</div>
+    </div>
+    <div class="card">
+      <div><span class="icon">📝</span><span class="name">Notes — Ghi chú</span></div>
+      <div class="desc">Soạn thảo Markdown, đồng bộ hóa thời gian thực.</div>
+      <div class="how">▶ Rich workspace API + markdown parser</div>
+    </div>
+    <div class="card">
+      <div><span class="icon">✅</span><span class="name">Tasks — Công việc</span></div>
+      <div class="desc">Danh sách việc cần làm, hỗ trợ CalDAV-task.</div>
+      <div class="how">▶ TASKS caldav backend + frontend app</div>
+    </div>
+    <div class="card">
+      <div><span class="icon">🎯</span><span class="name">Deck — Kanban</span></div>
+      <div class="desc">Bảng Kanban quản lý dự án, gắn thẻ, deadline.</div>
+      <div class="how">▶ MySQL/PG storage + REST API + WebSocket updates</div>
+    </div>
+    <div class="card">
+      <div><span class="icon">🗒️</span><span class="name">Collectives</span></div>
+      <div class="desc">Không gian làm việc nhóm chung (files + calendar + contacts).</div>
+      <div class="how">▶ Circle-based group folders with shared resources</div>
+    </div>
+    <div class="card">
+      <div><span class="icon">🔍</span><span class="name">Full Text Search</span></div>
+      <div class="desc">Tìm kiếm toàn văn trong tài liệu (chỉ mục Elasticsearch/PSQL).</div>
+      <div class="how">▶ Unified Search platform + provider plugins</div>
+    </div>
+  </div>
+</div>
+
+<!-- COMMUNICATION -->
+<div class="layer">
+  <div class="layer-title">💬 Truyền thông &amp; cộng tác</div>
+  <div class="grid">
+    <div class="card">
+      <div><span class="icon">📹</span><span class="name">Talk — Video/Thảo luận</span></div>
+      <div class="desc">Nhắn tin, gọi audio/video, phòng họp, livestream, ghi hình.</div>
+      <div class="how">▶ WebSocket/SIP (switchboard) + WebRTC (SFU/MCU qua sip.js)</div>
+    </div>
+    <div class="card">
+      <div><span class="icon">🌐</span><span class="name">Cloud Federation</span></div>
+      <div class="desc">Chia sẻ tệp/lịch qua mạng giữa các instance Nextcloud khác nhau.</div>
+      <div class="how">▶ Federation REST API + outward/inward share protocol</div>
+    </div>
+    <div class="card">
+      <div><span class="icon">📡</span><span class="name">Circles — Nhóm</span></div>
+      <div class="desc">Nhóm người dùng lồng nhau (nội bộ/ngoài), quản lý quyền.</div>
+      <div class="how">▶ Circle model in DB + member/share provider</div>
+    </div>
+    <div class="card">
+      <div><span class="icon">🤖</span><span class="name">Workflow OCR</span></div>
+      <div class="desc">Tự động trích văn bản từ ảnh/PDF khi tải lên.</div>
+      <div class="how">▶ Cron job + OCR engine (tesseract) → tag/preview</div>
+    </div>
+    <div class="card">
+      <div><span class="icon">🎥</span><span class="name">Spreed (legacy)</span></div>
+      <div class="desc">Tiền thân Talk — hội nghị truyền thống, vẫn hỗ trợ.</div>
+      <div class="how">▶ PHP backend + WebRTC, được Talk thay thế dần</div>
+    </div>
+  </div>
+</div>
+
+<!-- INTEGRATION -->
+<div class="layer">
+  <div class="layer-title">🔗 Tích hợp &amp; lưu trữ</div>
+  <div class="grid">
+    <div class="card">
+      <div><span class="icon">🪣</span><span class="name">Files External — Bên ngoài</span></div>
+      <div class="desc">Gắn S3, FTP, SFTP, Google Drive, OneDrive, WebDAV… như thư mục cục bộ.</div>
+      <div class="how">▶ External Storage app + provider mount points (admin-configured)</div>
+    </div>
+    <div class="card">
+      <div><span class="icon">📑</span><span class="name">Collabora / OnlyOffice</span></div>
+      <div class="desc">Sửa tài liệu Office trực tuyến theo thời gian thực.</div>
+      <div class="how">▶ WOPI proxy → Collabora/OnlyOffice editing backend</div>
+    </div>
+    <div class="card">
+      <div><span class="icon">📋</span><span class="name">Workflow Engine</span></div>
+      <div class="desc">Tự động hóa: trigger hành động khi sự kiện xảy ra (tải tệp, tạo user…).</div>
+      <div class="how">▶ Event-based rules + action plugins (request HTTP, send email…)</div>
+    </div>
+    <div class="card">
+      <div><span class="icon">📈</span><span class="name">Two-Factor TOTP</span></div>
+      <div class="desc">Xác thực 2 lớp qua app xác thực (Google Authenticator…).</div>
+      <div class="how">▶ TOTP provider + backup codes enforced per user</div>
+    </div>
+    <div class="card">
+      <div><span class="icon">🧩</span><span class="name">App Store</span></div>
+      <div class="desc">Cài thêm 400+ ứng dụng từ cộng đồng (thunder, calendar, spreed…).</div>
+      <div class="how">▶ OCS API + manual zip upload in admin panel</div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT ALL CONNECTS -->
+<div class="layer">
+  <div class="layer-title">🔄 Cách hoạt động — Luồng dữ liệu chính</div>
+  <div style="background:#161b22;border:1px solid #30363d;border-radius:12px;padding:20px 24px;line-height:1.8;font-size:.92em">
+    <b>1.</b> Người dùng truy cập qua <span style="color:#58a6ff">HTTP/HTTPS</span> → PHP-FPM → <b>index.php</b> (routing)<br/>
+    <b>2.</b> <b>Core</b> xử lý xác thực (user/session/token) → phân quyền (người/nhóm/circle)<br/>
+    <b>3.</b> Request được chuyển đến <b>app</b> tương ứng (Files, Calendar, Talk…) qua <span style="color:#58a6ff">routing.xml</span><br/>
+    <b>4.</b> App tương tác với <b>CSDL</b> (MySQL/PostgreSQL) qua <span style="color:#58a6ff">OCS API / DB layer</span><br/>
+    <b>5.</b> File upload/download đi qua <span style="color:#58a6ff">Filesystem abstraction</span> (mount points → local/external storage)<br/>
+    <b>6.</b> <b>Sync clients</b> dùng WebDAV PROPFIND/MKCOL/PUT để đồng bộ<br/>
+    <b>7.</b> <b>Talk</b> mở WebSocket + WebRTC peer connections qua <span style="color:#58a6ff">signaling server</span><br/>
+    <b>8.</b> <b>Cron</b> (định kỳ) chạy OCR, email fetch, background jobs<br/>
+    <b>9.</b> <b>Federation</b> proxy share requests giữa các instance qua REST<br/>
+    <b>10.</b> <b>External Storage</b> kết nối tới S3/FTP/WebDAV proxy trong background
+  </div>
+</div>
+
+</body>
+</html>
